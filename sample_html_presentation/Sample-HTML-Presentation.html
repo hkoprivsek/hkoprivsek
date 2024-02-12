@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Analyzing Melbourne Housing Market Data Via Parametric &amp; Bootstrap Multiple Linear Regression</title>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <meta name="generator" content="pandoc" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  <base target="_blank">
+
+  <script type="text/javascript">
+    var SLIDE_CONFIG = {
+      // Slide settings
+      settings: {
+                title: 'Analyzing Melbourne Housing Market Data Via Parametric &amp; Bootstrap Multiple Linear Regression',
+                        subtitle: 'Haley Koprivsek',
+                useBuilds: true,
+        usePrettify: true,
+        enableSlideAreas: true,
+        enableTouch: true,
+                      },
+
+      // Author information
+      presenters: [
+            ]
+    };
+  </script>
+
+  <script src="Sample-HTML-Presentation_files/header-attrs-2.24/header-attrs.js"></script>
+  <link href="Sample-HTML-Presentation_files/ioslides-13.5.1/fonts/fonts.css" rel="stylesheet" />
+  <link href="Sample-HTML-Presentation_files/ioslides-13.5.1/theme/css/default.css" rel="stylesheet" />
+  <link href="Sample-HTML-Presentation_files/ioslides-13.5.1/theme/css/phone.css" rel="stylesheet" />
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/modernizr.custom.45394.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/prettify/prettify.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/prettify/lang-r.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/prettify/lang-yaml.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/hammer.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/slide-controller.js"></script>
+  <script src="Sample-HTML-Presentation_files/ioslides-13.5.1/js/slide-deck.js"></script>
+
+  <style type="text/css">
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    em {
+      font-style: italic;
+    }
+
+    summary {
+      display: list-item;
+    }
+
+    details > summary > p:only-child {
+      display: inline;
+    }
+
+    slides > slide {
+      -webkit-transition: all 0.4s ease-in-out;
+      -moz-transition: all 0.4s ease-in-out;
+      -o-transition: all 0.4s ease-in-out;
+      transition: all 0.4s ease-in-out;
+    }
+
+    .auto-fadein {
+      -webkit-transition: opacity 0.6s ease-in;
+      -webkit-transition-delay: 0.4s;
+      -moz-transition: opacity 0.6s ease-in 0.4s;
+      -o-transition: opacity 0.6s ease-in 0.4s;
+      transition: opacity 0.6s ease-in 0.4s;
+      opacity: 0;
+    }
+/* https://github.com/ropensci/plotly/pull/524#issuecomment-468142578 */
+slide:not(.current) .plotly.html-widget{
+  display: block;
+}
+
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+            
+  </style>
+
+  <link rel="stylesheet" href="custom2.css" type="text/css" />
+
+</head>
+
+<body style="opacity: 0">
+
+<slides>
+
+  <slide class="title-slide segue nobackground">
+        <!-- The content of this hgroup is replaced programmatically through the slide_config.json. -->
+    <hgroup class="auto-fadein">
+      <h1 data-config-title><!-- populated from slide_config.json --></h1>
+      <h2 data-config-subtitle><!-- populated from slide_config.json --></h2>
+      <p data-config-presenter><!-- populated from slide_config.json --></p>
+            <p style="margin-top: 6px; margin-left: -2px;"><center><br />
+<img src="img/WCUlogo.png" width = 250 height = 150><br />
+</center></p>
+          </hgroup>
+  </slide>
+
+<slide class=""><hgroup><h2>Table of Contents</h2></hgroup><article  id="table-of-contents">
+
+<ul>
+<li>Introduction</li>
+<li>Exploratory Data Analysis</li>
+<li>Performing Multiple Linear Regression</li>
+<li>Bootstrap Multiple Linear Regression</li>
+<li>Final Model</li>
+<li>Conclusion &amp; Discussion</li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Introduction</h2></hgroup><article  id="introduction">
+
+<ul>
+<li>Data set related to homes on the Melbourne housing market
+
+<ul>
+<li>34,857 total observations and 21 different variables</li>
+<li>8 categorical variables (e.g. Suburb, Address, Method of Sale, etc.), 13 numerical (e.g. Number of Rooms, Selling Price, Distance From Central Business District, etc.)</li>
+</ul></li>
+<li>Exploratory Data Analysis &amp; MLR with Selling Price as response variable
+
+<ul>
+<li>Best MLR model chosen from several candidate models</li>
+</ul></li>
+</ul>
+
+</article></slide><slide class=""><hgroup><h2>Exploratory Data Analysis</h2></hgroup><article  id="exploratory-data-analysis">
+
+<ul>
+<li>Group location variable created using latitude/longitude data
+
+<ul>
+<li>factor variable: <strong>main.group</strong>, 1 = in main cluster of houses, 0 = not in main cluster <img src="Sample-HTML-Presentation_files/figure-html/unnamed-chunk-1-1.png" width="672" /></li>
+</ul></li>
+</ul>
+
+<pre >## Warning: NAs introduced by coercion</pre>
+
+</article></slide><slide class=""><hgroup><h2>Initial Full Model</h2></hgroup><article  id="initial-full-model">
+
+<table class = 'rmdtable'>
+<col width="20.547945%" />
+<col width="19.178082%" />
+<col width="17.808219%" />
+<col width="16.438356%" />
+<col width="26.027397%" />
+<tr class="header">
+<th align="left"></th>
+<th align="right">Estimate</th>
+<th align="right">Std. Error</th>
+<th align="right">t value</th>
+<th align="right">Pr(&gt;|t|)</th>
+</tr>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">341598.26372</td>
+<td align="right">35441.748430</td>
+<td align="right">9.6383017</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">Rooms</td>
+<td align="right">191050.76381</td>
+<td align="right">20835.328167</td>
+<td align="right">9.1695587</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">Typet</td>
+<td align="right">-330310.57353</td>
+<td align="right">19774.823888</td>
+<td align="right">-16.7035912</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">Typeu</td>
+<td align="right">-397338.37437</td>
+<td align="right">17058.481520</td>
+<td align="right">-23.2927165</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">Bedroom2</td>
+<td align="right">-10296.44660</td>
+<td align="right">20751.931053</td>
+<td align="right">-0.4961681</td>
+<td align="right">0.6197876</td>
+</tr>
+<tr class="even">
+<td align="left">Bathroom</td>
+<td align="right">259327.02431</td>
+<td align="right">9512.669773</td>
+<td align="right">27.2612243</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">Car</td>
+<td align="right">38405.27626</td>
+<td align="right">6011.405633</td>
+<td align="right">6.3887348</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="even">
+<td align="left">Landsize</td>
+<td align="right">23.36419</td>
+<td align="right">4.723378</td>
+<td align="right">4.9464991</td>
+<td align="right">0.0000008</td>
+</tr>
+<tr class="odd">
+<td align="left">BuildingArea</td>
+<td align="right">34.83513</td>
+<td align="right">11.819982</td>
+<td align="right">2.9471386</td>
+<td align="right">0.0032153</td>
+</tr>
+<tr class="even">
+<td align="left">main.groupTRUE</td>
+<td align="right">204924.13563</td>
+<td align="right">23100.687825</td>
+<td align="right">8.8709106</td>
+<td align="right">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="left">Distance.num</td>
+<td align="right">-36587.73611</td>
+<td align="right">1000.907423</td>
+<td align="right">-36.5545657</td>
+<td align="right">0.0000000</td>
+</tr>
+</table></article></slide>
+
+
+  <slide class="backdrop"></slide>
+
+</slides>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!-- map slide visiblity events into shiny -->
+<script>
+  (function() {
+    if (window.jQuery) {
+       window.jQuery(document).on('slideleave', function(e) {
+         window.jQuery(e.target).trigger('hidden');
+      });
+       window.jQuery(document).on('slideenter', function(e) {
+         window.jQuery(e.target).trigger('shown');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
